@@ -1,0 +1,4 @@
+{
+    "db_type": "mongodb",
+    "db_connection": "mongodb://127.0.0.1"
+}

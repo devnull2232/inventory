@@ -1,0 +1,125 @@
+syntax = "proto3";
+package catalog;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+service Catalog {
+    rpc GetAllItems (google.protobuf.Empty) returns (stream GetAllItemsResponse) {}
+    rpc GetItemsByTags (Tags) returns (stream GetItemsByTagResponse) {}
+    rpc GetItemById (ID) returns (GetItemByIdResponse) {}
+    rpc AddItem (Item) returns (AddItemResponse) {}
+    //TODO: Update item
+    rpc GetStockHistory (google.protobuf.Empty) returns (stream GetStockHistoryResponse) {}
+}
+
+message ID{
+    bytes id = 1;
+}
+
+message Tags{
+    repeated Tag tag = 1;
+}
+
+message Tag{
+    string tagName = 1;
+}
+
+// Item in a inventory of an area
+message Item {
+    repeated Tag tag = 1;
+    string productName = 2;
+    bytes id = 3;
+    string imageResource = 4;
+    string size = 5;
+    StockState state = 6;
+}
+
+message StockState {
+    int32 originalStockLevel = 1;
+    int32 currentStockLevel = 2;
+    google.protobuf.Timestamp lastRestock = 3;
+    float lastPrice = 4;
+    int32 stockWaitingToBeReceived = 5;
+    Justification justification = 6;
+    Provider lastProvider = 7;
+}
+
+message Justification {
+    string text = 1;
+    Employee employee = 2;
+    google.protobuf.Timestamp postedOn = 3;
+    repeated EditHistory history = 4;
+}
+
+message EditHistory {
+    string text = 1;
+    google.protobuf.Timestamp lastEdit = 2;
+}
+
+message Employee {
+    string name = 1;
+    string email = 2;
+    string employeeCode = 3;
+    repeated PhoneNumber phoneNumber = 5;
+}
+
+message Provider {
+    string name = 1;
+    string taxId = 2;
+    string address = 3;
+    repeated PhoneNumber phoneNumber = 4;
+}
+
+message PhoneNumber {
+    string countryCode = 1;
+    string number = 2;
+    PhoneType phoneType = 3;
+}
+
+enum PhoneType {
+    WORK = 0;
+    MOBILE = 1;
+}
+
+message Commentary {
+    string commentary = 1;
+    Employee author = 2;
+    google.protobuf.Timestamp postedOn = 3;
+    repeated EditHistory history = 4;
+}
+
+message GetAllItemsResponse {
+    bool success = 1;
+    Item item = 2;
+    Error error = 3;
+}
+
+message GetItemsByTagResponse {
+    bool sucess = 1;
+    Item item = 2;
+    Error error = 3;
+}
+
+message GetItemByIdResponse {
+    bool success = 1;
+    Item item = 2;
+    Error error = 3;
+}
+
+message AddItemResponse {
+    bool success = 1;
+    Item item = 2;
+    Error error = 3;
+}
+
+message GetStockHistoryResponse {
+    bool success = 1;
+    Item item = 2;
+    Error error = 3;
+}
+
+message Error{
+    int32 errorCode = 1;
+    string message = 2;
+}

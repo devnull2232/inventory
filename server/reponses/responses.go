@@ -1,0 +1,6 @@
+package responses;
+
+import (
+	"fmt"
+)
+
