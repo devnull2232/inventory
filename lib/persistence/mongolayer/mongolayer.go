@@ -68,8 +68,6 @@ func (mongoLayer *MongoDBLayer) InitializeClient(ctx *context.Context) error {
 	if err == nil {
 		fmt.Println("Connected to the Database!")
 
-	}	else {
-		fmt.Println(err)
 	}
 	return err
 }
