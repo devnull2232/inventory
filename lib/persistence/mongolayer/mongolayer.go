@@ -8,7 +8,7 @@ import (
 	"github.com/mongodb/mongo-go-driver/bson"
 	//"github.com/mongodb/mongo-go-driver/x/bsonx"
 	"log"
-	// "github.com/mongodb/mongo-go-driver/bson/primitive"
+	"github.com/mongodb/mongo-go-driver/bson/primitive"
 	"context"
 	"time"
 	"fmt"
@@ -87,7 +87,7 @@ func (mongoLayer *MongoDBLayer) InitializeClient(ctx *context.Context) error {
 
 // Gets all items in the catalog
 // mongoLayer MUST call this method ONLY AFTER having called InitializeClient
-func (mongoLayer *MongoDBLayer) GetAllItems(ctx *context.Context) ([]persistence.Item, error){
+func (mongoLayer *MongoDBLayer) GetAllItems(ctx *context.Context) (*[]persistence.Item, error){
 	return mongoLayer.GetItemsByTag(ctx)
 }
 
@@ -106,13 +106,8 @@ func traverseItems(cursor *mongo.Cursor, ctx *context.Context, items *[]persiste
 	return err
 }
 
-func setupToGetItems(m *MongoDBLayer) ([]persistence.Item, *mongo.Collection){
-	return []persistence.Item{}, m.client.Database(DB).Collection(CATALOG)
-}
-
-func (mongoLayer *MongoDBLayer) GetItemsByTag(ctx *context.Context, strings ...string) ([]persistence.Item, error){
-	items, coll := setupToGetItems(mongoLayer)
-	tags :=  bson.A{}
+func (mongoLayer *MongoDBLayer) GetItemsByTag(ctx *context.Context, strings ...string) (*[]persistence.Item, error){
+	items, coll, tags := []persistence.Item{}, mongoLayer.client.Database(DB).Collection(CATALOG), bson.A{}
 	for _, s := range strings {
 		tags = append(tags, s)
 	}
@@ -132,7 +127,17 @@ func (mongoLayer *MongoDBLayer) GetItemsByTag(ctx *context.Context, strings ...s
 	if err != nil{
 		return nil, err
 	}
-	return items, err
+	return &items, err
+}
+
+func (mongoLayer *MongoDBLayer) GetItemById(ctx *context.Context, id *primitive.ObjectID) (*persistence.Item, error){
+	item, coll := persistence.Item{}, mongoLayer.client.Database(DB).Collection(CATALOG)
+	result := coll.FindOne(*ctx, bson.D{{"_id", id}})
+	err := result.Decode(&item)
+	if err != nil{
+		return nil, err
+	}
+	return &item, err 
 }
 
 // mgo.v2
