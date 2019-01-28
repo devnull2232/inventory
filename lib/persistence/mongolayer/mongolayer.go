@@ -8,6 +8,7 @@ import (
 	"github.com/mongodb/mongo-go-driver/bson"
 	//"github.com/mongodb/mongo-go-driver/x/bsonx"
 	"log"
+	// "github.com/mongodb/mongo-go-driver/bson/primitive"
 	"context"
 	"time"
 	"fmt"
@@ -15,7 +16,7 @@ import (
 
 const (
 	DB = "inventory"	// db name
-	CATALOG = "catalog" // collection
+	CATALOG = "catalog" // collection name
 	TIMEOUT = 5*time.Second
 )
 
@@ -87,25 +88,52 @@ func (mongoLayer *MongoDBLayer) InitializeClient(ctx *context.Context) error {
 // Gets all items in the catalog
 // mongoLayer MUST call this method ONLY AFTER having called InitializeClient
 func (mongoLayer *MongoDBLayer) GetAllItems(ctx *context.Context) ([]persistence.Item, error){
-	client := mongoLayer.client
-	items := []persistence.Item{}
-	cursor, err := client.Database(DB).Collection(CATALOG).Find(*ctx, bson.D{}, nil)
-	defer cursor.Close(*ctx)
-	if err != nil{
-		fmt.Println("There was an error while trying to retrieve all the catalog items.")
-		return nil, err
-	}
-	for cursor.Next(*ctx) {
-		var item persistence.Item
-		err = cursor.Decode(&item)
-		if err != nil {
-			return nil, err
+	return mongoLayer.GetItemsByTag(ctx)
+}
+
+func traverseItems(cursor *mongo.Cursor, ctx *context.Context, items *[]persistence.Item) error{
+	var (
+		err error
+		item persistence.Item
+	)
+	for (*cursor).Next(*ctx) {
+		err = (*cursor).Decode(&item)
+		if err != nil{
+			return err
 		}
-		items = append(items, item)
+		(*items) = append(*items, item)
+	}
+	return err
+}
+
+func setupToGetItems(m *MongoDBLayer) ([]persistence.Item, *mongo.Collection){
+	return []persistence.Item{}, m.client.Database(DB).Collection(CATALOG)
+}
+
+func (mongoLayer *MongoDBLayer) GetItemsByTag(ctx *context.Context, strings ...string) ([]persistence.Item, error){
+	items, coll := setupToGetItems(mongoLayer)
+	tags :=  bson.A{}
+	for _, s := range strings {
+		tags = append(tags, s)
+	}
+	var (
+		cursor mongo.Cursor
+		err error
+	)
+	if len(tags) != 0 {
+		cursor, err = coll.Find(*ctx, bson.D{
+			{"tags", bson.D{{"$all", tags}}},
+		})
+	} else {
+		cursor, err = coll.Find(*ctx, bson.D{})
+	}
+	defer cursor.Close(*ctx)
+	err = traverseItems(&cursor, ctx, &items)
+	if err != nil{
+		return nil, err
 	}
 	return items, err
 }
-
 
 // mgo.v2
 // func (mgoLayer *MongoDBLayer) GetItemsByTag(tag string) (*[]persistence.Item, error){}

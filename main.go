@@ -32,6 +32,7 @@ func main(){
 	}
 	
 	items, err := mongohandler.GetAllItems(&ctx)
+	// items, err := mongohandler.GetItemsByTag(&ctx, "gaseosa", "xd")
 	if err != nil{
 		panic(err)
 	}
