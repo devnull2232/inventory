@@ -10,6 +10,7 @@ import (
 	// "time"
 	// "log"
 	// "github.com/mongodb/mongo-go-driver/bson"
+	"github.com/davecgh/go-spew/spew"
 )
 
 func main(){
@@ -34,6 +35,7 @@ func main(){
 	if err != nil{
 		panic(err)
 	}
-	fmt.Println(items)
-	 
+
+	//fmt.Printf("%v\n", items)
+	 spew.Dump(items)
 }

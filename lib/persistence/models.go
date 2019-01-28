@@ -2,49 +2,51 @@ package persistence;
 
 import (
 	"time"
+	"github.com/mongodb/mongo-go-driver/bson/primitive"
 )
 
 type Item struct {
-	ID			string		`json:"id"`
-	Tags		[]string	`json:"tags"`
-	ProductName	string		`json:"product_name"`
-	Image		string		`json:"image"`
-	Size		string		`json:"size"`
-	StockState	StockState	`json:"stock_state"`
+	ID			*primitive.ObjectID		`json:"id" bson:"_id"`
+	Tags		[]string				`json:"tags" bson:"tags"`
+	ProductName	string					`json:"productName" bson:"productName"`
+	Image		string					`json:"image" bson:"image"`
+	Size		string					`json:"size" bson:"size"`
+	StockState	StockState				`json:"stockState" bson:"stockState"`
 }
 
 type StockState struct {
-	OriginalStockLevel			int32			`json:"original_level"`
-	CurrentStockLevel			int32			`json:"current_level"`
-	LastRestock					time.Time		`json:"last_restock"`
-	LastPrice					float32			`json:"last_price"`
-	StockWaitingToBeReceived	int32			`json:"stock_to_receive"`
-	Justification				Justification	`json:"justification"`
+	OriginalStockLevel			int32				`json:"originalLevel" bson:"originalLevel"`
+	CurrentStockLevel			int32				`json:"currentLevel" bson:"currentLevel"`
+	LastRestock					time.Time			`json:"lastRestock" bson:"lastRestock"`
+	LastPrice					float64				`json:"lastPrice" bson:"lastPrice"`
+	StockWaitingToBeReceived	int32				`json:"stockToReceive" bson:"stockToReceive"`
+	JustificationStruct			JustificationStruct	`json:"justificationStruct" bson:"justificationStruct"`
 }
 
+
+
 type Justification struct {
-	Text		string		`json:"text"`
-	Employee	Employee	`json:"employee"`
-	PostedOn	time.Time	`json:"posted_on"`
-	EditHistory	EditHistory	`json:"edit_history"`
+	Text		string		`json:"text" bson:"text"`
+	Employee	Employee	`json:"employee" bson:"employee"`
+	PostedOn	time.Time	`json:"postedOn" bson:"postedOn"`
+}
+
+type JustificationStruct struct {
+	LastJustification	Justification	`json:"lastJustification" bson:"lastJustification"`
+	EditHistory			[]Justification	`json:"editHistory" bson:"editHistory"`
 }
 
 type Employee struct {
-	Name			string		`json:"name"`
-	Email			string		`json:"email"`
-	EmployeeCode	string		`json:"employee_code"`
-	PhoneNumber		[]PhoneNumber	`json:"phone_number"`
-}
-
-type EditHistory struct {
-	Text		string		`json:"text"`
-	LastEdit	time.Time	`json:"last_edit"`
+	Name			string		`json:"name" bson:"name"`
+	Email			string		`json:"email" bson:"email"`
+	EmployeeCode	string		`json:"employeeCode" bson:"employeeCode"`
+	PhoneNumber		[]PhoneNumber	`json:"phoneNumber" bson:"phoneNumber"`
 }
 
 type PhoneNumber struct {
-	CountryCode		int32		`json:"country_code"`
-	Number			string		`json:"number"`
-	PhoneType		PhoneType	`json:"phone_type"`
+	CountryCode		int32		`json:"countryCode" bson:"countryCode"`
+	Number			string		`json:"number" bson:"number"`
+	PhoneType		PhoneType	`json:"phoneType" bson:"phoneType"`
 }
 
 type PhoneType int32

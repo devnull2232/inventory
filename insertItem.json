@@ -1,0 +1,83 @@
+{
+	tags: [
+        "bebida",
+        "gaseosa"
+    ],
+    productName: "Coca Cola",
+	image: "coca-cola.jpg",
+	size: "personal",
+	stockState: {
+        originalLevel: 120,
+        currentLevel: 30,
+        lastRestock: new Date(),
+        lastPrice: 2.20,
+        stockToReceive: 100,
+        justificationStruct: {
+            lastJustification: {
+                text: "hay un evento el sábado",
+                employee: {
+                    name: "Reynaldo",
+                    email:  "reynaldo.rz.26@gmail.com",
+                    employeeCode: "1234abcd",
+                    phoneNumber: [
+                        {
+                            countryCode: 51,
+                            number: "987654321",
+                            phoneType: 3
+                        },
+                        {
+                            countryCode: 51,
+                            number: "7654321",
+                            phoneType: 1
+                        }
+                    ]
+                },
+                postedOn: new Date()
+            },
+            editHistory: [
+                {
+                    text: "xddd",
+                    employee: {
+                        name: "Juan",
+                        email:  "juan@gmail.com",
+                        employeeCode: "abcd1234",
+                        phoneNumber: [
+                            {
+                                countryCode: 51,
+                                number: "999999999",
+                                phoneType: 3
+                            },
+                            {
+                                countryCode: 51,
+                                number: "3127654",
+                                phoneType: 1
+                            }
+                        ]
+                    },
+                    postedOn: new Date()
+                },
+                {
+                    text: "xd",
+                    employee: {
+                        name: "Juan",
+                        email:  "juan@gmail.com",
+                        employeeCode: "abcd1234",
+                        phoneNumber: [
+                            {
+                                countryCode: 51,
+                                number: "999999999",
+                                phoneType: 3
+                            },
+                            {
+                                countryCode: 51,
+                                number: "3127654",
+                                phoneType: 1
+                            }
+                        ]
+                    },
+                    postedOn: new Date()
+                }
+            ]
+        }
+    }
+}

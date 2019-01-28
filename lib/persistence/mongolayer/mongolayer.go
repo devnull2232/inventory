@@ -5,7 +5,7 @@ import (
 	// mgo "gopkg.in/mgo.v2"
 	// migrating from mgo.v2 to the mongodb official driver
 	"github.com/mongodb/mongo-go-driver/mongo"
-	//"github.com/mongodb/mongo-go-driver/bson"
+	"github.com/mongodb/mongo-go-driver/bson"
 	//"github.com/mongodb/mongo-go-driver/x/bsonx"
 	"log"
 	"context"
@@ -58,7 +58,6 @@ func NewMongoDBLayer(connection string) (*MongoDBLayer, error){
 
 // This method initializes the client by starting background monitoring goroutines
 // It returns a pointer to a context.Context that has 'timeout', a context.CancelFunc, and a error
-// pasar contexto
 func (mongoLayer *MongoDBLayer) InitializeClient(ctx *context.Context) error {
 	err := mongoLayer.client.Connect(*ctx)
 	if err != nil{
@@ -90,22 +89,20 @@ func (mongoLayer *MongoDBLayer) InitializeClient(ctx *context.Context) error {
 func (mongoLayer *MongoDBLayer) GetAllItems(ctx *context.Context) ([]persistence.Item, error){
 	client := mongoLayer.client
 	items := []persistence.Item{}
-	cursor, err := client.Database(DB).Collection(CATALOG).Find(*ctx, nil)
+	cursor, err := client.Database(DB).Collection(CATALOG).Find(*ctx, bson.D{}, nil)
+	defer cursor.Close(*ctx)
 	if err != nil{
 		fmt.Println("There was an error while trying to retrieve all the catalog items.")
 		return nil, err
 	}
-	defer cursor.Close(*ctx)
-	// doc := bsonx.Doc{}
-	// for cursor.Next(*ctx){
-	// 	doc = doc[:0]
-	// 	err = cursor.Decode(doc)
-
-	// }
-	if err := cursor.Decode(&items); err != nil{
-		log.Fatal(err)
+	for cursor.Next(*ctx) {
+		var item persistence.Item
+		err = cursor.Decode(&item)
+		if err != nil {
+			return nil, err
+		}
+		items = append(items, item)
 	}
-
 	return items, err
 }
 
